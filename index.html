@@ -326,9 +326,9 @@
         return true;
       }
 
-      // Strategy 2: Client/transaction view — insert before the status badge in the header
-      // The client header ends with a status badge (pd = Badge component), find the header element
-      const header = document.querySelector('header.flex.items-center');
+      // Strategy 2: Client/transaction view — the header is a <header> element
+      // (no theme toggle in this view, just address + status badge)
+      const header = document.querySelector('header');
       if (header) {
         header.appendChild(wrap);
         attachBellListeners();
