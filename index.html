@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Transaction Flow — Real Estate Transaction Checklist</title>
     <meta name="description" content="Transaction Flow — shared checklist for real estate agents, buyers, sellers, and transaction coordinators." />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/transaction-flow-app/manifest.json" />
+    <meta name="theme-color" content="#0d9488" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TxFlow" />
+    <link rel="apple-touch-icon" href="/transaction-flow-app/icons/apple-touch-icon.png" />
+
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet" />
     <script type="module" crossorigin src="/transaction-flow-app/assets/index-fix5.js"></script>
@@ -491,6 +501,16 @@
       panelOpen = false;
       setTimeout(() => { tryMount(); fetchNotifications(); }, 400);
     });
+  </script>
+
+  <script>
+    // Register service worker for PWA install
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/transaction-flow-app/sw.js')
+          .catch(err => console.warn('SW registration failed:', err));
+      });
+    }
   </script>
   </body>
 </html>
