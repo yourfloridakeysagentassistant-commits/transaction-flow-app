@@ -1,9 +1,9 @@
 // TxFlow Service Worker
-const CACHE = 'txflow-v1';
+const CACHE = 'txflow-v6';
 const SHELL = [
   '/transaction-flow-app/',
   '/transaction-flow-app/index.html',
-  '/transaction-flow-app/assets/index-fix5.js',
+  '/transaction-flow-app/assets/index-fix6.js',
   '/transaction-flow-app/assets/index-DEQDGvGW.css',
   '/transaction-flow-app/manifest.json',
   '/transaction-flow-app/icons/icon-192x192.png',
