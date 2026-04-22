@@ -274,14 +274,8 @@
     }
 
     // ── Mount ─────────────────────────────────────────────────────────────────
-    function mountBell() {
-      // Find the header's flex row — look for the theme toggle button area
-      const themeBtn = document.querySelector('[aria-label="Toggle theme"]');
-      if (!themeBtn) return false;
-
-      const wrap = document.createElement('div');
-      wrap.id = 'tf-bell-wrap';
-      wrap.innerHTML = `
+    function buildBellHTML() {
+      return `
         <button id="tf-bell-btn" aria-label="Notifications">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -297,31 +291,51 @@
           <div id="tf-notif-list"></div>
         </div>
       `;
+    }
 
-      // Insert bell before the theme toggle button
-      themeBtn.parentNode.insertBefore(wrap, themeBtn);
-
-      // Toggle panel
+    function attachBellListeners() {
       document.getElementById('tf-bell-btn').addEventListener('click', e => {
         e.stopPropagation();
         panelOpen = !panelOpen;
         document.getElementById('tf-notif-panel').classList.toggle('open', panelOpen);
       });
-
       document.getElementById('tf-mark-all-btn').addEventListener('click', e => {
         e.stopPropagation();
         markAllRead();
       });
-
-      // Close on outside click
       document.addEventListener('click', e => {
         if (!document.getElementById('tf-bell-wrap')?.contains(e.target)) {
           panelOpen = false;
           document.getElementById('tf-notif-panel')?.classList.remove('open');
         }
       });
+    }
 
-      return true;
+    function mountBell() {
+      if (document.getElementById('tf-bell-wrap')) return true; // already mounted
+
+      const wrap = document.createElement('div');
+      wrap.id = 'tf-bell-wrap';
+      wrap.innerHTML = buildBellHTML();
+
+      // Strategy 1: Dashboard — insert before the theme toggle button
+      const themeBtn = document.querySelector('[aria-label="Toggle theme"]');
+      if (themeBtn) {
+        themeBtn.parentNode.insertBefore(wrap, themeBtn);
+        attachBellListeners();
+        return true;
+      }
+
+      // Strategy 2: Client/transaction view — insert before the status badge in the header
+      // The client header ends with a status badge (pd = Badge component), find the header element
+      const header = document.querySelector('header.flex.items-center');
+      if (header) {
+        header.appendChild(wrap);
+        attachBellListeners();
+        return true;
+      }
+
+      return false;
     }
 
     // ── Wiggle keyframe ───────────────────────────────────────────────────────
@@ -330,17 +344,28 @@
     document.head.appendChild(wiggle);
 
     // Wait for React to render the header, then mount
+    let realtimeSubscribed = false;
     function tryMount(attempts = 0) {
       if (mountBell()) {
         fetchNotifications();
-        subscribeRealtime();
-        // Refresh times every minute
-        setInterval(renderPanel, 60000);
+        if (!realtimeSubscribed) {
+          subscribeRealtime();
+          realtimeSubscribed = true;
+          setInterval(renderPanel, 60000);
+        }
       } else if (attempts < 30) {
         setTimeout(() => tryMount(attempts + 1), 300);
       }
     }
     tryMount();
+
+    // Re-mount bell on hash/route changes (dashboard ↔ client view)
+    window.addEventListener('hashchange', () => {
+      // Remove existing bell so it re-injects into the new view's header
+      document.getElementById('tf-bell-wrap')?.remove();
+      panelOpen = false;
+      setTimeout(() => tryMount(), 400);
+    });
   </script>
   </body>
 </html>
