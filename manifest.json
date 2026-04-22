@@ -6,7 +6,7 @@
   "scope": "/transaction-flow-app/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0f172a",
+  "background_color": "#ffffff",
   "theme_color": "#0d9488",
   "icons": [
     { "src": "/transaction-flow-app/icons/icon-72x72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
