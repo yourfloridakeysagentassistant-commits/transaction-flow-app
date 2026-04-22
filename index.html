@@ -7,7 +7,7 @@
     <meta name="description" content="Transaction Flow — shared checklist for real estate agents, buyers, sellers, and transaction coordinators." />
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="/transaction-flow-app/assets/index-fix3.js"></script>
+    <script type="module" crossorigin src="/transaction-flow-app/assets/index-fix4.js"></script>
     <link rel="stylesheet" crossorigin href="/transaction-flow-app/assets/index-DEQDGvGW.css">
   </head>
   <body>
@@ -309,17 +309,27 @@
       return 'agent'; // default for agent/TC dashboard view
     }
 
-    async function fetchNotifications() {
+    function getViewContext() {
       const hash = window.location.hash || '';
-      // On client links (#/t/:slug), show buyer/seller notifications
-      // On agent/dashboard views, show agent notifications
-      const role = hash.startsWith('#/t/') ? null : 'agent';
+      // /#/t/:slug  — client/private link
+      const clientMatch = hash.match(/^#\/t\/([^/]+)/);
+      if (clientMatch) return { role: null, slug: clientMatch[1], txId: null };
+      // /#/transaction/:id  — agent transaction detail
+      const txMatch = hash.match(/^#\/transaction\/(\d+)/);
+      if (txMatch) return { role: 'agent', slug: null, txId: Number(txMatch[1]) };
+      // /#/  — dashboard
+      return { role: 'agent', slug: null, txId: null };
+    }
+
+    async function fetchNotifications() {
+      const { role, txId } = getViewContext();
       let query = sb
         .from('notifications')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
       if (role) query = query.eq('recipient_role', role);
+      if (txId) query = query.eq('transaction_id', txId);
       const { data, error } = await query;
       if (!error && data) {
         notifications = data;
