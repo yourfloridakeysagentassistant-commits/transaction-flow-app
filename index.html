@@ -76,20 +76,22 @@
         pointer-events: none;
       }
       #tf-notif-panel {
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        width: 340px;
-        max-width: calc(100vw - 24px);
+        position: fixed;
+        top: 60px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        max-width: 380px;
+        margin-left: auto;
         background: var(--card, #fff);
         border: 1px solid var(--border, #e5e7eb);
         border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.18);
         z-index: 9999;
         overflow: hidden;
         display: none;
         flex-direction: column;
-        max-height: 480px;
+        max-height: calc(100vh - 80px);
       }
       #tf-notif-panel.open { display: flex; }
       .tf-notif-header {
