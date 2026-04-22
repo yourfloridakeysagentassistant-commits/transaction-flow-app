@@ -119,6 +119,42 @@
           color: #8e8e93 !important;
         }
       }
+      /* Also target the app's .dark class (used by React theme toggle) */
+      .dark #tf-notif-panel {
+        background: #1c1c1e !important;
+        border-color: #2c2c2e !important;
+      }
+      .dark .tf-notif-header {
+        border-bottom-color: #2c2c2e !important;
+        background: #1c1c1e !important;
+      }
+      .dark .tf-notif-header h3 {
+        color: #f5f5f7 !important;
+      }
+      .dark .tf-mark-all {
+        color: #38bdf8 !important;
+      }
+      .dark .tf-notif-item {
+        border-bottom-color: #2c2c2e !important;
+        background: #1c1c1e !important;
+      }
+      .dark .tf-notif-item:hover {
+        background: #2c2c2e !important;
+      }
+      .dark .tf-notif-item.unread {
+        background: #0c2233 !important;
+      }
+      .dark .tf-notif-item.unread:hover {
+        background: #0e2a3d !important;
+      }
+      .dark .tf-notif-title {
+        color: #f5f5f7 !important;
+      }
+      .dark .tf-notif-desc,
+      .dark .tf-notif-time,
+      .dark .tf-notif-empty {
+        color: #8e8e93 !important;
+      }
       #tf-notif-panel.open { display: flex; }
       .tf-notif-header {
         display: flex;
@@ -262,12 +298,29 @@
     }
 
     // ── Data ──────────────────────────────────────────────────────────────────
+    function getCurrentRole() {
+      // Read role from the hash — /#/t/:slug = client view, /#/transaction/:id = agent view
+      const hash = window.location.hash || '';
+      // Try to read the role the React app has set on a known element
+      const roleEl = document.querySelector('[data-role]');
+      if (roleEl) return roleEl.dataset.role;
+      // Fallback: private links are buyer/seller, dashboard/transaction are agent
+      if (hash.startsWith('#/t/')) return null; // client — show all for their role (handled server-side)
+      return 'agent'; // default for agent/TC dashboard view
+    }
+
     async function fetchNotifications() {
-      const { data, error } = await sb
+      const hash = window.location.hash || '';
+      // On client links (#/t/:slug), show buyer/seller notifications
+      // On agent/dashboard views, show agent notifications
+      const role = hash.startsWith('#/t/') ? null : 'agent';
+      let query = sb
         .from('notifications')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
+      if (role) query = query.eq('recipient_role', role);
+      const { data, error } = await query;
       if (!error && data) {
         notifications = data;
         renderPanel();
@@ -394,7 +447,7 @@
       // Remove existing bell so it re-injects into the new view's header
       document.getElementById('tf-bell-wrap')?.remove();
       panelOpen = false;
-      setTimeout(() => tryMount(), 400);
+      setTimeout(() => { tryMount(); fetchNotifications(); }, 400);
     });
   </script>
   </body>
