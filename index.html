@@ -7,7 +7,7 @@
     <meta name="description" content="Transaction Flow — shared checklist for real estate agents, buyers, sellers, and transaction coordinators." />
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="/transaction-flow-app/assets/index-fix4.js"></script>
+    <script type="module" crossorigin src="/transaction-flow-app/assets/index-fix5.js"></script>
     <link rel="stylesheet" crossorigin href="/transaction-flow-app/assets/index-DEQDGvGW.css">
   </head>
   <body>
@@ -247,6 +247,22 @@
         flex-shrink: 0;
         margin-top: 5px;
       }
+      .tf-notif-delete {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #9ca3af;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        flex-shrink: 0;
+        align-self: flex-start;
+        margin-top: -1px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .tf-notif-delete:hover { color: #ef4444; background: #fee2e2; }
+      .dark .tf-notif-delete:hover { background: #3b1111 !important; }
     `;
     document.head.appendChild(style);
 
@@ -285,11 +301,21 @@
             <span class="tf-notif-time">${timeAgo(n.created_at)}</span>
           </div>
           ${!n.read ? '<div class="tf-unread-dot"></div>' : ''}
+          <button class="tf-notif-delete" data-del-id="${n.id}" title="Delete">&times;</button>
         </div>
       `).join('');
 
       list.querySelectorAll('.tf-notif-item').forEach(el => {
-        el.addEventListener('click', () => markRead(Number(el.dataset.id)));
+        el.addEventListener('click', (e) => {
+          if (e.target.closest('.tf-notif-delete')) return;
+          markRead(Number(el.dataset.id));
+        });
+      });
+      list.querySelectorAll('.tf-notif-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteNotification(Number(btn.dataset.delId));
+        });
       });
     }
 
@@ -347,6 +373,12 @@
       notifications = notifications.map(n => ({ ...n, read: true }));
       renderPanel();
       await sb.from('notifications').update({ read: true }).eq('read', false);
+    }
+
+    async function deleteNotification(id) {
+      notifications = notifications.filter(n => n.id !== id);
+      renderPanel();
+      await sb.from('notifications').delete().eq('id', id);
     }
 
     // ── Realtime ──────────────────────────────────────────────────────────────
