@@ -19,6 +19,19 @@
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet" />
     <script type="module" crossorigin src="/transaction-flow-app/assets/index-fix5.js"></script>
     <link rel="stylesheet" crossorigin href="/transaction-flow-app/assets/index-DEQDGvGW.css">
+    <style id="txflow-theme">
+      /* Override primary color to navy/teal to match TxFlow icon */
+      :root {
+        --primary: 221 73% 18%;
+        --primary-foreground: 0 0% 100%;
+        --ring: 221 73% 18%;
+      }
+      .dark {
+        --primary: 185 74% 30%;
+        --primary-foreground: 0 0% 100%;
+        --ring: 185 74% 30%;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
