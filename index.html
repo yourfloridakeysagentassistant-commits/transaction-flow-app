@@ -25,12 +25,14 @@
       task_due: 'Task due',
       new_transaction: 'New transaction',
       status_change: 'Status changed',
+      note_received: 'New message',
     };
     const TYPE_ICONS = {
       task_complete: '✅',
       task_due: '⏰',
       new_transaction: '🏠',
       status_change: '📋',
+      note_received: '💬',
     };
 
     let notifications = [];
@@ -83,15 +85,39 @@
         width: auto;
         max-width: 380px;
         margin-left: auto;
-        background: var(--card, #fff);
-        border: 1px solid var(--border, #e5e7eb);
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
         border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.18);
-        z-index: 9999;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.10);
+        z-index: 99999;
         overflow: hidden;
         display: none;
         flex-direction: column;
         max-height: calc(100vh - 80px);
+      }
+      @media (prefers-color-scheme: dark) {
+        #tf-notif-panel {
+          background: #1c1c1e;
+          border-color: #2c2c2e;
+        }
+        .tf-notif-header {
+          border-bottom-color: #2c2c2e !important;
+        }
+        .tf-notif-header h3 {
+          color: #f5f5f7 !important;
+        }
+        .tf-notif-item {
+          border-bottom-color: #2c2c2e !important;
+        }
+        .tf-notif-item:hover {
+          background: #2c2c2e !important;
+        }
+        .tf-notif-title {
+          color: #f5f5f7 !important;
+        }
+        .tf-notif-desc, .tf-notif-time, .tf-notif-empty {
+          color: #8e8e93 !important;
+        }
       }
       #tf-notif-panel.open { display: flex; }
       .tf-notif-header {
@@ -141,8 +167,12 @@
       }
       .tf-notif-item:last-child { border-bottom: none; }
       .tf-notif-item:hover { background: var(--secondary, #f9fafb); }
-      .tf-notif-item.unread { background: color-mix(in srgb, var(--primary, #0ea5e9) 5%, transparent); }
-      .tf-notif-item.unread:hover { background: color-mix(in srgb, var(--primary, #0ea5e9) 10%, transparent); }
+      .tf-notif-item.unread { background: #eff8ff; }
+      .tf-notif-item.unread:hover { background: #dff0fd; }
+      @media (prefers-color-scheme: dark) {
+        .tf-notif-item.unread { background: #0c2233 !important; }
+        .tf-notif-item.unread:hover { background: #0e2a3d !important; }
+      }
       .tf-notif-icon {
         font-size: 18px;
         flex-shrink: 0;
